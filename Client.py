@@ -5,7 +5,7 @@ import time
 from mss import mss
 from requests import get
 import os
-
+#asd
 def screen(client_socket):
     message = ".img"
     client_socket.send(message.encode('utf-8'))
