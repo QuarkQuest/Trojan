@@ -5,7 +5,7 @@ import time
 clients = {}
 client_names = {}
 
-
+count = 1
 
 def handle_client(client_socket):
   while True:
@@ -102,6 +102,8 @@ def send_private_message(message, sender_socket):
   except Exception as e:
     print(f"Ошибка при отправке личного сообщения: {e}")
 def remove(client_socket):
+  global count
+  count = count - 1
   print(f"Клиент {client_names[client_socket]} отключился")
   if client_socket in clients:
     del clients[client_socket]
@@ -109,11 +111,11 @@ def remove(client_socket):
       del client_names[client_socket]
 
 def accept_connections(server):
-  count = 1
+
   while True:
     client_socket, addr = server.accept()
     clients[client_socket] = addr
-
+    global count
     name = client_socket.recv(1024).decode('utf-8')
     name += str(count)
     count += 1

