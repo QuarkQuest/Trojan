@@ -68,7 +68,6 @@ def broadcast(message, client_socket):
       except:
         remove(client)
 
-
 def send_private_message(message, sender_socket):
   try:
     if ':' not in message:
